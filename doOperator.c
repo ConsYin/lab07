@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -9,6 +10,15 @@ static int op_quit(struct tokenStack *stack);
 static int op_print(struct tokenStack *stack);
 static int op_dump(struct tokenStack *stack);
 static int op_add(struct tokenStack *stack);
+static int op_multiply(struct tokenStack *stack);
+static int op_divide(struct tokenStack *stack);
+static int op_minus(struct tokenStack *stack);
+static int op_less(struct tokenStack *stack);
+static int op_lessEqual(struct tokenStack *stack);
+static int op_mod(struct tokenStack *stack);
+static int op_greatEqual(struct tokenStack *stack);
+static int op_greater(struct tokenStack *stack);
+static int op_equal(struct tokenStack *stack);
 
 static struct operator_struct {
   char *name;
@@ -17,20 +27,25 @@ static struct operator_struct {
   {"quit", op_quit},
   {"print", op_print},
   {"dump", op_dump},
-  {"+", op_add},
-  {(char *)NULL, (int(*)(struct tokenStack *)) NULL}
+  {"+", op_add},{"*", op_multiply},{"-", op_minus},{"/", op_divide},{"MOD", op_mod}
+  ,{"LE", op_lessEqual},{"GE", op_greatEqual},{"GT", op_greater},{"LT", op_less},{"EQ", op_equal}
+  ,{(char *)NULL, (int(*)(struct tokenStack *)) NULL}
 };
 
 
 /* YOU WRITE THIS */
 static int popInt(struct tokenStack *s)
 {
-  return 0;
+  return atoi(popTokenStack(s)->symbol);
 }
 
 /* YOU WRITE THIS */
 static void pushInt(struct tokenStack *s, int v)
 {
+	struct lexToken *c=allocToken();
+	c->kind=LEX_TOKEN_NUMBER;
+	stpcpy(c->symbol,gcvt(v));
+	pushTokenStack(s,c);
 }
 
 int doOperator(struct tokenStack *stack, char *o) 
@@ -73,5 +88,84 @@ static int op_add(struct tokenStack *stack)
   v1 = popInt(stack);
   v2 = popInt(stack);
   pushInt(stack, v1+v2);
+  return(0);
+}
+static int op_multiply(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  pushInt(stack, v1*v2);
+  return(0);
+}
+static int op_divide(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  pushInt(stack, v1/v2);
+  return(0);
+}
+
+static int op_minus(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  pushInt(stack, v1-v2);
+  return(0);
+}
+static int op_greater(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  if(v1>v2) pushInt(stack, 1);
+  else pushInt(stack, 0);
+  return(0);
+}
+
+static int op_less(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  if(v1<v2) pushInt(stack, 1);
+  else pushInt(stack, 0);
+  return(0);
+}
+static int op_greatEqual(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  if(v1>=v2) pushInt(stack, 1);
+  else pushInt(stack, 0);
+  return(0);
+}
+static int op_lessEqual(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  if(v1<=v2) pushInt(stack, 1);
+  else pushInt(stack, 0);
+  return(0);
+}
+static int op_equal(struct tokenStack *stack)
+{
+  int v1, v2;
+  v1 = popInt(stack);
+  v2 = popInt(stack);
+  if(v1==v2) pushInt(stack, 1);
+  else pushInt(stack, 0);
+  return(0);
+}
+static int op_mod(struct tokenStack *stack)
+{
+  int v1;
+  v1 = popInt(stack);
+  pushInt(stack, v1);pushInt(stack, v1);
+  else pushInt(stack, 0);
   return(0);
 }
